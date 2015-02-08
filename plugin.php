@@ -5,7 +5,7 @@ Description: A plugin to easily print the registrations from a particular event 
 Author: James Emmrich
 Version: 0.1
 Author URI: http://about.me/jemmrich/
-URL: https://github.com/jemmrich/PrintEspressoRegistrations
+Plugin URI: https://github.com/jemmrich/PrintEspressoRegistrations
 */
 
 // Add plugin to the side menu.
