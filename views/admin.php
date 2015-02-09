@@ -63,7 +63,10 @@
             <select name="event_id" method="get">
                 <?php
                     foreach($events as $event){
-                        echo "<option value='" . $event->ID . "'>" . date("Y-m-d", strtotime($event->post_date)) . " - " . $event->post_title . "</option>";
+                        if($event->ID != $_GET["event_id"])
+                            echo "<option value='" . $event->ID . "'>" . date("Y-m-d", strtotime($event->post_date)) . " - " . $event->post_title . "</option>";
+                        else
+                            echo "<option selected value='" . $event->ID . "'>" . date("Y-m-d", strtotime($event->post_date)) . " - " . $event->post_title . "</option>";
                     }
                 ?>
             </select>

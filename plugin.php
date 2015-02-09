@@ -3,7 +3,7 @@
 Plugin Name: Print Espresso Registrations
 Description: A plugin to easily print the registrations from a particular event from Event Espresso 4
 Author: James Emmrich
-Version: 0.1
+Version: 0.5
 Author URI: http://about.me/jemmrich/
 Plugin URI: https://github.com/jemmrich/PrintEspressoRegistrations
 */
@@ -20,17 +20,18 @@ function per_admin_menu(){
     global $wp_admin_bar;
     if(!is_super_admin() || !is_admin_bar_showing()) return;
     
+    $siteurl = site_url();
+    
     $argsParent = array(
         'id' => 'per-registrations',
         'title' => 'Print Registrations',
-        'href' => 'admin.php?page=print-registrations'
+        'href' => $siteurl.'/wp-admin/admin.php?page=print-registrations'
     );
     $wp_admin_bar->add_menu($argsParent);
 }
 
 
 class PrintEspressoRegistrations{
-
     public function init(){
         $events = PrintEspressoRegistrations::getEvents();
 
@@ -108,18 +109,19 @@ class PrintEspressoRegistrations{
                 TXN_paid 
             FROM
                 {$wpdb->prefix}esp_attendee_meta 
-            INNER JOIN
+            LEFT JOIN
                 {$wpdb->prefix}esp_registration 
             ON
                 {$wpdb->prefix}esp_attendee_meta.ATT_ID = {$wpdb->prefix}esp_registration.ATT_ID 
-            INNER JOIN 
+            LEFT JOIN 
 	            wp_esp_transaction 
             ON 
 	            wp_esp_transaction.TXN_ID = wp_esp_transaction.TXN_ID 
             WHERE
-                {$wpdb->prefix}esp_registration.EVT_ID = %d";
+                {$wpdb->prefix}esp_registration.EVT_ID = %d
+            GROUP BY {$wpdb->prefix}esp_registration.ATT_ID";
         
-        $attendees = $wpdb->get_results( $wpdb->prepare( $sql, $event_id ));
+        $attendees = $wpdb->get_results($wpdb->prepare($sql, $event_id));
         
         if(sizeof($attendees) == 0)
             return false;

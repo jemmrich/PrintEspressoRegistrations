@@ -5,7 +5,7 @@
     <input type="button" value="Print Report" class="per-print-button" onclick="javascript:window.print();"/>
 
     <h3><?=$event_name?></h3>
-    <h4>Event date: <?=$event_date?></h4>
+    <h4>Event date: <?=date('Y-m-d', strtotime($event_date))?></h4>
     
     <table class="per-registrations">
         <tr>
@@ -27,7 +27,7 @@
                 echo '  <td>' . $attendee->ATT_ID . '</td>';
                 echo '  <td nowrap><a href="admin.php?page=espresso_registrations&action=edit_attendee&post=' . $attendee->ATT_ID . '">' . $attendee->ATT_fname . ' ' . $attendee->ATT_lname . '</a></td>';
                 echo '  <td nowrap>' . $attendee->ATT_email . '</td>';
-                echo '  <td nowrap>' . $attendee->REG_date . '</td>';
+                echo '  <td nowrap>' . date('Y-m-d', strtotime($attendee->REG_date)) . '</td>';
                 echo '  <td nowrap>' . $attendee->REG_code . '</td>';
                 echo '  <td style="display: none;">$' . number_format($attendee->REG_final_price, 2) . '</td>';
                 echo '  <td style="display: none;">$' . number_format($attendee->REG_final_price, 2) . '</td>';
