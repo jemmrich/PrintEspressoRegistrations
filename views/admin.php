@@ -26,6 +26,9 @@
     }
 
     @media print{
+        html body *{
+            visability: hidden;
+        }
         #adminmenuback, #adminmenuwrap, #wpfooter {
             display: none;
         }

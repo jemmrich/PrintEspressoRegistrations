@@ -9,29 +9,19 @@
     
     <table class="per-registrations">
         <tr>
-            <th width="50px">Contact ID</th>
-            <th width="">Name</th>
-            <th width="">Email</th>
-            <th width="140px">Reg Date</th>
-            <th width="100px">Reg Code</th>
-            <th width="100px" style="display: none;">TXN Price</th>
-            <th width="100px" style="display: none;">Total Txn</th>
+            <th width="150px">Name</th>
+            <th width="100px">Phone</th>
             <th width="100px">Paid</th>
-            <th width="100%">Comments</th>
+            <th width="">Comments</th>
         </tr>
         
         <?php 
         if($attendees != false){
             foreach($attendees as $attendee){
                 echo '<tr>';
-                echo '  <td>' . $attendee->ATT_ID . '</td>';
-                echo '  <td nowrap><a href="admin.php?page=espresso_registrations&action=edit_attendee&post=' . $attendee->ATT_ID . '">' . $attendee->ATT_fname . ' ' . $attendee->ATT_lname . '</a></td>';
-                echo '  <td nowrap>' . $attendee->ATT_email . '</td>';
-                echo '  <td nowrap>' . date('Y-m-d', strtotime($attendee->REG_date)) . '</td>';
-                echo '  <td nowrap>' . $attendee->REG_code . '</td>';
-                echo '  <td style="display: none;">$' . number_format($attendee->REG_final_price, 2) . '</td>';
-                echo '  <td style="display: none;">$' . number_format($attendee->REG_final_price, 2) . '</td>';
-                if(number_format($attendee->TXN_price, 2) == number_format($attendee->REG_final_price, 2))
+                echo '  <td><a href="admin.php?page=espresso_registrations&action=edit_attendee&post=' . $attendee->ATT_ID . '">' . $attendee->ATT_fname . ' ' . $attendee->ATT_lname . '</a></td>';
+                echo '  <td>' . $attendee->ATT_phone . '</td>';
+                if($attendee->TXN_paid >= $attendee->TXN_total)
                     echo '  <td>Paid</td>';
                 else
                     echo '  <td>Not Paid</td>';
@@ -39,9 +29,9 @@
                 echo '</tr>';
                 
             }
-            echo '<tr><td colspan="6" align="right">Total Attendees:</td><td>' . sizeof($attendees) . '</td></tr>';
+            echo '<tr><td colspan="3" align="right">Total Attendees:</td><td>' . sizeof($attendees) . '</td></tr>';
         }else{
-            echo '<tr><td colspan="7" align="center">There are currently no registrations.</td></tr>';
+            echo '<tr><td colspan="4" align="center">There are currently no registrations.</td></tr>';
         }
         ?>
     </table>

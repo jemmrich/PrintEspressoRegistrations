@@ -102,11 +102,13 @@ class PrintEspressoRegistrations{
                 {$wpdb->prefix}esp_registration.ATT_ID, 
                 ATT_fname, 
                 ATT_lname, 
+                ATT_phone, 
                 ATT_email, 
                 REG_date, 
                 REG_code, 
                 REG_final_price,
-                TXN_paid 
+                TXN_paid,
+                TXN_total 
             FROM
                 {$wpdb->prefix}esp_attendee_meta 
             LEFT JOIN
@@ -114,12 +116,12 @@ class PrintEspressoRegistrations{
             ON
                 {$wpdb->prefix}esp_attendee_meta.ATT_ID = {$wpdb->prefix}esp_registration.ATT_ID 
             LEFT JOIN 
-	            wp_esp_transaction 
+	            {$wpdb->prefix}esp_transaction 
             ON 
-	            wp_esp_transaction.TXN_ID = wp_esp_transaction.TXN_ID 
+	            {$wpdb->prefix}esp_transaction.TXN_ID = {$wpdb->prefix}esp_registration.TXN_ID 
             WHERE
-                {$wpdb->prefix}esp_registration.EVT_ID = %d
-            GROUP BY {$wpdb->prefix}esp_registration.ATT_ID";
+                {$wpdb->prefix}esp_registration.EVT_ID = %d AND 
+                {$wpdb->prefix}esp_registration.REG_deleted = 0";
         
         $attendees = $wpdb->get_results($wpdb->prepare($sql, $event_id));
         
