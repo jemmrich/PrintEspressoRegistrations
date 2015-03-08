@@ -1,0 +1,3 @@
+[submodule "libs/dompdf"]
+	path = libs/dompdf
+	url = https://github.com/dompdf/dompdf.git
