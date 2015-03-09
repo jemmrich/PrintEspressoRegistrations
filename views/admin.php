@@ -67,9 +67,9 @@
                 <?php
                     foreach($events as $event){
                         if($event->ID != $_GET["event_id"])
-                            echo "<option value='" . $event->ID . "'>" . date("Y-m-d", strtotime($event->post_date)) . " - " . $event->post_title . "</option>";
+                            echo "<option value='" . $event->ID . "'>" . date("Y-m-d", strtotime($event->DTT_EVT_start)) . " - " . $event->post_title . "</option>";
                         else
-                            echo "<option selected value='" . $event->ID . "'>" . date("Y-m-d", strtotime($event->post_date)) . " - " . $event->post_title . "</option>";
+                            echo "<option selected value='" . $event->ID . "'>" . date("Y-m-d", strtotime($event->DTT_EVT_start)) . " - " . $event->post_title . "</option>";
                     }
                 ?>
             </select>

@@ -33,6 +33,15 @@ function per_admin_menu(){
 
 class PrintEspressoRegistrations{
     public function init(){
+        
+        // Stream the PDF if it was requested...
+        $action = $_GET["action"];
+        if(isset($action) && $action == "getpdf"){
+            PrintEspressoRegistrations::renderPDF($event_id);
+            return true;
+        }
+        
+        // Show the HTML report...
         $events = PrintEspressoRegistrations::getEvents();
 
         require("views/admin.php");
@@ -40,9 +49,10 @@ class PrintEspressoRegistrations{
         $event_id = $_GET["event_id"];
         if(isset($event_id)){
             $event = PrintEspressoRegistrations::getEvent($event_id);
-            PrintEspressoRegistrations::renderRegistrations($event->post_title, $event->post_date, $event_id);
+            PrintEspressoRegistrations::renderRegistrations($event->post_title, $event->DTT_EVT_start, $event_id);
         }
     }
+    
     
     /**
      * renderRegistrations
@@ -57,6 +67,9 @@ class PrintEspressoRegistrations{
         global $wpdb;
         
         $attendees = PrintEspressoRegistrations::getRegistrations($event_id);
+        
+        $report_html = PrintEspressoRegistrations::renderReport($event_id);
+        
         require("views/registrations.php");
     }
 
@@ -71,12 +84,18 @@ class PrintEspressoRegistrations{
     private function getEvents(){
         global $wpdb;
         
-        $sql = "SELECT * 
+        $sql = "SELECT 
+                    ID , 
+                    post_title ,
+                    DTT_EVT_start ,
+                    DTT_EVT_end
                 FROM 
-                    {$wpdb->prefix}posts 
+                    {$wpdb->prefix}posts, 
+                    {$wpdb->prefix}esp_datetime
                 WHERE 
                     post_type='espresso_events' AND 
-                    post_status='publish' 
+                    post_status='publish' AND 
+                    {$wpdb->prefix}esp_datetime.EVT_ID = {$wpdb->prefix}posts.ID
                 ORDER BY post_date DESC";
         $events = $wpdb->get_results($wpdb->prepare($sql, 0));
         
@@ -143,13 +162,73 @@ class PrintEspressoRegistrations{
     private function getEvent($event_id){
         global $wpdb;
         
-        $sql = "SELECT post_title, post_date FROM {$wpdb->prefix}posts WHERE ID=%d LIMIT 1";
-        $event = $wpdb->get_results($wpdb->prepare($sql, $event_id));
+        $sql = "SELECT
+                    post_title ,
+                    DTT_EVT_start ,
+                    DTT_EVT_end 
+                FROM
+                    {$wpdb->prefix}posts, 
+                    {$wpdb->prefix}esp_datetime 
+                WHERE 
+                    ID=%d AND
+                    {$wpdb->prefix}esp_datetime.EVT_ID = %d
+                LIMIT 1";
+        $event = $wpdb->get_results($wpdb->prepare($sql, $event_id, $event_id));
             
         if(sizeof($event) == 0)
             return false;
         
         return $event[0];
     }
+    
+    
+    /**
+     * renderReport
+     *
+     * Produces an HTML report of the event_id passed.
+     *
+     * @param int $event_id  ID of the event in event espresso.
+     * @return string html
+     */
+    private function renderReport($event_id){
+        global $wpdb;
+        
+        $attendees = PrintEspressoRegistrations::getRegistrations($event_id);
+        
+        ob_start();
+        
+        require("views/report_template.php");
+        
+        $html_report = ob_get_contents();
+        
+        ob_end_clean();
+        
+        return $html_report;
+    }
+    
+    
+    /**
+     * renderPDF
+     *
+     * Produces an PDF and streams it to the browser for the report of the event_id passed.
+     *
+     * @param int $event_id  ID of the event in event espresso.
+     * @return bool true
+     */
+    private function renderPDF($event_id){
+        global $wpdb;
+        
+        $html_report = PrintEspressoRegistrations::renderReport($event_id);
+        $event = PrintEspressoRegistrations::getEvent($event_id);
+        
+        require("libs/dompdf/dompdf.php");
+        $dompdf = new DOMPDF();
+        $dompdf->load_html($html_report);
+        $dompdf->set_paper("letter", "portrait");
+        $dompdf->render();
 
+        $dompdf->stream($event->post_title . " - " . date("Y-m-d", strtotime($event->DTT_EVT_start)) . ".pdf", array("Attachment" => true));
+
+        return true;
+    }
 }

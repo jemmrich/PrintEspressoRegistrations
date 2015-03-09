@@ -6,9 +6,21 @@ This plugin does not make any database changes, only creates a simple report of 
 Download and install the plugin. A new menu will appear in the admin topbar and admin sidebar.
 
 # Requirements
+## Event Espresso 4
 Requires, Event Espresso 4
 
 Note: This has not been tested with Event Espresso 3.
+
+## dompdf
+Set up dompdf submodule
+cd <plugin path>
+git submodule init
+git submodule update
+
+Set up php-font-lib submodule
+cd libs/dompdf
+git submodule init
+git submodule update
 
 # License
 GPL 3.0
