@@ -1,9 +1,10 @@
 <?php
+ob_start();
 /*
 Plugin Name: Print Espresso Registrations
 Description: A plugin to easily print the registrations from a particular event from Event Espresso 4
 Author: James Emmrich
-Version: 0.5
+Version: 0.8
 Author URI: http://about.me/jemmrich/
 Plugin URI: https://github.com/jemmrich/PrintEspressoRegistrations
 */
@@ -32,13 +33,13 @@ function per_admin_menu(){
 
 
 class PrintEspressoRegistrations{
-    public function init(){
+    public static function init(){
+        $event_id = $_GET["event_id"];
         
         // Stream the PDF if it was requested...
         $action = $_GET["action"];
         if(isset($action) && $action == "getpdf"){
             PrintEspressoRegistrations::renderPDF($event_id);
-            return true;
         }
         
         // Show the HTML report...
@@ -46,7 +47,6 @@ class PrintEspressoRegistrations{
 
         require("views/admin.php");
         
-        $event_id = $_GET["event_id"];
         if(isset($event_id)){
             $event = PrintEspressoRegistrations::getEvent($event_id);
             PrintEspressoRegistrations::renderRegistrations($event->post_title, $event->DTT_EVT_start, $event_id);
@@ -63,7 +63,7 @@ class PrintEspressoRegistrations{
      * @param string $event_date Event date
      * @param int $event_id about this param
      */
-    private function renderRegistrations($event_name, $event_date, $event_id){
+    private static function renderRegistrations($event_name, $event_date, $event_id){
         global $wpdb;
         
         $attendees = PrintEspressoRegistrations::getRegistrations($event_id);
@@ -81,7 +81,7 @@ class PrintEspressoRegistrations{
      *
      * @return array of event objects
      */
-    private function getEvents(){
+    private static function getEvents(){
         global $wpdb;
         
         $sql = "SELECT 
@@ -114,7 +114,7 @@ class PrintEspressoRegistrations{
      * @param int $event_id about this param
      * @return array of registration objects
      */
-    private function getRegistrations($event_id){
+    private static function getRegistrations($event_id){
         global $wpdb;
         
         $sql = "SELECT
@@ -159,7 +159,7 @@ class PrintEspressoRegistrations{
      * @param int $event_id  ID of the event in event espresso.
      * @return object event
      */
-    private function getEvent($event_id){
+    private static function getEvent($event_id){
         global $wpdb;
         
         $sql = "SELECT
@@ -190,10 +190,11 @@ class PrintEspressoRegistrations{
      * @param int $event_id  ID of the event in event espresso.
      * @return string html
      */
-    private function renderReport($event_id){
+    private static function renderReport($event_id){
         global $wpdb;
         
         $attendees = PrintEspressoRegistrations::getRegistrations($event_id);
+        $event = PrintEspressoRegistrations::getEvent($event_id);
         
         ob_start();
         
@@ -213,22 +214,21 @@ class PrintEspressoRegistrations{
      * Produces an PDF and streams it to the browser for the report of the event_id passed.
      *
      * @param int $event_id  ID of the event in event espresso.
-     * @return bool true
      */
-    private function renderPDF($event_id){
+    private static function renderPDF($event_id){
         global $wpdb;
         
         $html_report = PrintEspressoRegistrations::renderReport($event_id);
         $event = PrintEspressoRegistrations::getEvent($event_id);
         
-        require("libs/dompdf/dompdf.php");
+        require_once("libs/dompdf/dompdf_config.inc.php");
+        //require("libs/dompdf/dompdf.php");
         $dompdf = new DOMPDF();
         $dompdf->load_html($html_report);
-        $dompdf->set_paper("letter", "portrait");
+        //$dompdf->set_paper("letter", "portrait");
         $dompdf->render();
-
+        
         $dompdf->stream($event->post_title . " - " . date("Y-m-d", strtotime($event->DTT_EVT_start)) . ".pdf", array("Attachment" => true));
-
-        return true;
+        exit();
     }
 }

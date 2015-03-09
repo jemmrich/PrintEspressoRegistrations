@@ -2,25 +2,7 @@
     .per-event-select-form{
         margin: 20px 0px;
     }
-    .per-registrations {
-        width: 100%;
-        border: 1px solid black;
-        border-spacing: 0px;
-    }
-    .per-registrations th{
-        font-weight: 700;
-        text-align: left;
-        padding: 10px;
-        border-bottom: 1px solid black;
-    }
-    .per-registrations td{
-        padding: 10px;
-        border-bottom: 1px solid black;
-    }
-    .per-registrations tr:last-child td{
-        border: 0px;
-        font-weight: 700;
-    }
+    
     .per-print-button{
         margin: 10px;
     }

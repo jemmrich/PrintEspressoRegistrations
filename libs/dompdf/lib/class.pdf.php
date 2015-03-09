@@ -3107,8 +3107,18 @@ EOT;
       $options = array();
     }
 
+    // Below commented out by James Emmrich https://github.com/jemmrich/
+    // because wordpress admin outputs data on us when we want to stream.
+    // As per: http://stackoverflow.com/questions/19524709/dompdf-unable-to-stream-pdf-headers-already-sent
+    /*
     if ( headers_sent()) {
       die("Unable to stream pdf: headers already sent");
+    }
+    */
+    // 4 lines added by James Emmrich https://github.com/jemmrich/
+    $output = ob_get_clean();
+    if ( headers_sent()){
+        echo $output;
     }
 
     $debug = empty($options['compression']);
